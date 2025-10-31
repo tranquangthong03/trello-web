@@ -1,32 +1,54 @@
-// Updated by trungquandev.com's author on May 13 2023
-// Sample Eslint config for React project
 module.exports = {
-  env: { browser: true, es2020: true, node: true },
+  env: {
+    browser: true,
+    es2020: true,
+    node: true,
+  },
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
+    "plugin:prettier/recommended",
   ],
-  parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-  settings: { react: { version: "18.2" } },
-  plugins: ["react", "react-hooks", "react-refresh"],
+  parserOptions: {
+    ecmaVersion: "latest",
+    sourceType: "module",
+  },
+  settings: {
+    react: {
+      version: "18.2",
+    },
+  },
+  plugins: ["react", "react-hooks", "react-refresh", "prettier"],
   rules: {
-    // React
+    // --- React ---
     "react-refresh/only-export-components": "warn",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react/prop-types": 0,
     "react/display-name": 0,
 
-    // MUI
-    "no-restricted-imports": [
-      "error",
+    // --- MUI ---
+    'no-restricted-imports': [
+      'error',
       {
-        patterns: [{ regex: "^@mui/[^/]+$" }],
+        patterns: ['^@mui/[^/]+$'], // ✅ chỉ dùng chuỗi thay vì object có regex
       },
     ],
 
+
+
+    // --- General ---
+    "prettier/prettier": [
+      "error",
+      {
+        semi: false,
+        singleQuote: true,
+        trailingComma: "none",
+        endOfLine: "auto",
+      },
+    ],
     "no-console": 1,
     "no-lonely-if": 1,
     "no-unused-vars": 1,
@@ -36,13 +58,13 @@ module.exports = {
     "space-before-blocks": ["error", "always"],
     "object-curly-spacing": [1, "always"],
     indent: ["warn", 2],
-    semi: [1, "never"],
+    semi: ["error", "never"],
     quotes: ["error", "single"],
     "array-bracket-spacing": 1,
     "linebreak-style": 0,
     "no-unexpected-multiline": "warn",
     "keyword-spacing": 1,
-    "comma-dangle": 1,
+    "comma-dangle": ["error", "never"],
     "comma-spacing": 1,
     "arrow-spacing": 1,
   },
