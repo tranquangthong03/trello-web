@@ -19,7 +19,7 @@ module.exports = {
       version: "18.2",
     },
   },
-  plugins: ["react", "react-hooks", "react-refresh", "prettier"],
+  plugins: ["react", "react-hooks", "react-refresh"],
   rules: {
     // --- React ---
     "react-refresh/only-export-components": "warn",
@@ -29,25 +29,14 @@ module.exports = {
     "react/display-name": 0,
 
     // --- MUI ---
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: ['^@mui/[^/]+$'], // ✅ chỉ dùng chuỗi thay vì object có regex
-      },
-    ],
-
-
-
-    // --- General ---
-    "prettier/prettier": [
+    "no-restricted-imports": [
       "error",
       {
-        semi: false,
-        singleQuote: true,
-        trailingComma: "none",
-        endOfLine: "auto",
+        patterns: ["^@mui/[^/]+$"],
       },
     ],
+
+    // --- General ---
     "no-console": 1,
     "no-lonely-if": 1,
     "no-unused-vars": 1,
