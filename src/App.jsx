@@ -11,6 +11,7 @@ import Box from '@mui/material/Box'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness'
+import Container from '@mui/material/Container'
 
 function ModeSelect() {
   const { mode, setMode } = useColorScheme()
@@ -51,32 +52,36 @@ function ModeSelect() {
   )
 }
 
-function ModeToggle() {
-  const { mode, setMode } = useColorScheme()
-
-  return (
-    <Button
-      onClick={() => {
-        setMode(mode === 'light' ? 'dark' : 'light')
-      }}
-    >
-      {mode === 'light' ? 'Turn dark' : 'Turn light'}
-    </Button>
-  )
-}
 function App() {
   return (
-    <>
-      <ModeSelect />
-      <hr />
-      <ModeToggle />
-      <hr />
-      <Button variant="text">Text</Button>
-      <Button variant="contained">Contained</Button>
-      <Button variant="outlined">Outlined</Button>
-      <AccessAlarmIcon />
-      <ThreeDRotation />
-    </>
+    <Container disableGutters maxWidth="false" sx={{ height: '100vh' }}>
+      <Box sx={{
+        backgroundColor: 'primary.light',
+        width: '100%',
+        height: (theme) => theme.trello.appBarHeight,
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <ModeSelect />
+      </Box>
+      <Box sx={{
+        backgroundColor: 'primary.dark',
+        width: '100%',
+        height: (theme) => theme.trello.boardBarHeight,
+        display: 'flex',
+        alignItems: 'center'
+      }}></Box>
+      <Box sx={{
+        backgroundColor: 'primary.main',
+        width: '100%',
+        height: (theme) => `calc(100vh - ${theme.trello.appBarHeight} - ${theme.trello.boardBarHeight})`,
+        display: 'flex',
+        alignItems: 'center'
+
+      }}>
+        Board content
+      </Box>
+    </Container>
   )
 }
 
