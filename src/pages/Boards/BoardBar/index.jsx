@@ -102,6 +102,9 @@ function BoardBar() {
               height: '34px',
               fontSize: '16px',
               border: 'none'
+            },
+            '& .MuiAvatar-circular': {
+              bgcolor: '#a4b0be'
             }
           }}
           max={4}
