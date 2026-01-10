@@ -14,7 +14,8 @@ import { ContentCopySharp, ContentPaste } from '@mui/icons-material'
 import AddCardIcon from '@mui/icons-material/AddCard'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
-function Column() {
+import { mapOrder } from '~/ultis/sorts'
+function Column( {column} ) {
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
   const handleClick = (event) => {
@@ -23,6 +24,7 @@ function Column() {
   const handleClose = () => {
     setAnchorEl(null)
   }
+  const orderCards = mapOrder(column?.cards, column?.cardOrderIds, '_id')
   return (
     <Box sx={{
       minWidth:'300px',
@@ -44,7 +46,7 @@ function Column() {
         <Typography
           sx={{ fontWeight:'bold', cursor:'pointer' }}
         >
-          Column title
+          {column?.title}
         </Typography>
         <Box>
           <Tooltip title="List actions" sx={{ cursor:'pointer' }}>
@@ -110,7 +112,7 @@ function Column() {
         </Box>
       </Box>
       {/* Column listcards */}
-      <ListCards />
+      <ListCards cards={orderCards}/>
       {/* Box column footer */}
       <Box sx={{
         height: (theme) => theme.trello.columnFooterHeight,
