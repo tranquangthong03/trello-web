@@ -1,7 +1,34 @@
 import Box from '@mui/material/Box'
 import Card from './Card/Card'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-function ListCards( {cards} ) {
+import { Fragment } from 'react'
+function ListCards({ cards, activeDragItemId, activeDragItemData, cardDropPreview, columnId }) {
+  const renderDropPreview = (index) => {
+    if (cardDropPreview?.columnId !== columnId || cardDropPreview.index !== index) return null
+
+    return (
+      <Box
+        key={`drop-preview-${columnId}-${index}`}
+        sx={{
+          minHeight: 48,
+          border: '2px dashed rgba(255, 255, 255, 0.9)',
+          borderRadius: 1,
+          bgcolor: 'rgba(255, 255, 255, 0.3)',
+          backgroundImage: activeDragItemData?.cover ? `url(${activeDragItemData.cover})` : 'none',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          color: '#1f2937',
+          display: 'flex',
+          alignItems: 'center',
+          px: 1.5,
+          opacity: 0.55
+        }}
+      >
+        {activeDragItemData?.title}
+      </Box>
+    )
+  }
+
   return (
     <SortableContext items={cards?.map(card => card._id)} strategy={verticalListSortingStrategy}>
       <Box sx={{
@@ -20,9 +47,15 @@ function ListCards( {cards} ) {
           backgroundColor: '#bfc2cf'
         }
       }}>
-        {cards?.map((card) => {
-          return <Card key={card._id} card={card}/>
+        {cards?.map((card, index) => {
+          return (
+            <Fragment key={card._id}>
+              {renderDropPreview(index)}
+              {card._id !== activeDragItemId && <Card card={card}/>} 
+            </Fragment>
+          )
         })}
+        {renderDropPreview(cards?.length || 0)}
       </Box>
     </SortableContext>
   )

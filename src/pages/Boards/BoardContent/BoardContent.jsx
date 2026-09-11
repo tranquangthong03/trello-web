@@ -31,6 +31,7 @@ function BoardContent({ board }) {
   const [activeDragItemId, setActiveDragItemId] = useState(null)
   const [activeDragItemType, setActiveDragItemType] = useState(null)
   const [activeDragItemData, setActiveDragItemData] = useState(null)
+  const [cardDropPreview, setCardDropPreview] = useState(null)
   useEffect(() => {
     setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
   }, [board])
@@ -39,6 +40,7 @@ function BoardContent({ board }) {
     return orderedColumns.find(column => column.cards?.some(card => card._id === cardId))
   }
   const handleDragStart = (event) => {
+    setCardDropPreview(null)
     setActiveDragItemId(event?.active?.id)
     setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
     setActiveDragItemData(event?.active?.data?.current)
@@ -62,10 +64,17 @@ function BoardContent({ board }) {
     //activeColumn có thể undefind do hàm findColumnByCardId không thể hoạt động được
     if (!activeColumn || !overColumn) return
 
-    // Xử lý trường hợp kéo thả giữa 2 column khác nhau
-    if (activeColumn._id !== overColumn._id) {
-      console.log('Kéo thả card ở 2 column khác nhau')
-    }
+    const overIndex = overColumn.cards?.findIndex(card => card._id === overCardId)
+    const previewIndex = overIndex === -1 ? overColumn.cards.length : overIndex
+    setCardDropPreview((currentPreview) => {
+      if (
+        currentPreview?.columnId === overColumn._id &&
+        currentPreview.index === previewIndex
+      ) {
+        return currentPreview
+      }
+      return { columnId: overColumn._id, index: previewIndex }
+    })
   }
 
   const handleDragEnd = (event) => {
@@ -90,12 +99,13 @@ function BoardContent({ board }) {
           if (!activeCard) return currentColumns
 
           if (sourceColumnIndex === targetColumnIndex) {
-            const oldIndex = sourceColumn.cards.findIndex(card => card._id === active.id)
-            const newIndex = targetColumn.cards.findIndex(card => card._id === over.id)
+            const reorderedCards = sourceColumn.cards.filter(card => card._id !== active.id)
+            const overIndex = reorderedCards.findIndex(card => card._id === over.id)
+            const newIndex = over.id === targetColumn._id ? reorderedCards.length : overIndex
 
-            if (newIndex === -1 || oldIndex === newIndex) return currentColumns
+            if (newIndex === -1) return currentColumns
 
-            const reorderedCards = arrayMove(sourceColumn.cards, oldIndex, newIndex)
+            reorderedCards.splice(newIndex, 0, activeCard)
             const updatedColumns = [...currentColumns]
             updatedColumns[sourceColumnIndex] = {
               ...sourceColumn,
@@ -137,6 +147,7 @@ function BoardContent({ board }) {
       setActiveDragItemId(null)
       setActiveDragItemType(null)
       setActiveDragItemData(null)
+      setCardDropPreview(null)
       return
     }
 
@@ -155,12 +166,14 @@ function BoardContent({ board }) {
     setActiveDragItemId(null)
     setActiveDragItemType(null)
     setActiveDragItemData(null)
+    setCardDropPreview(null)
   }
 
   const handleDragCancel = () => {
     setActiveDragItemId(null)
     setActiveDragItemType(null)
     setActiveDragItemData(null)
+    setCardDropPreview(null)
   }
 
   const dropAnimation = {
@@ -186,11 +199,16 @@ function BoardContent({ board }) {
         height: (theme) => theme.trello.boardContentHeight,
         p: '10px 0'
       }}>
-        <ListColumns columns={orderedColumns}/>
+        <ListColumns
+          columns={orderedColumns}
+          activeDragItemId={activeDragItemId}
+          activeDragItemData={activeDragItemData}
+          cardDropPreview={cardDropPreview}
+        />
         <DragOverlay dropAnimation={dropAnimation}>
           {!activeDragItemType && null}
           {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragItemData}/>}
-          {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <Card card={activeDragItemData}/>}
+          {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <Card card={activeDragItemData} isOverlay/>}
         </DragOverlay>
       </Box>
     </DndContext>

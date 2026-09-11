@@ -19,7 +19,7 @@ import { mapOrder } from '~/ultis/sorts'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-function Column( { column } ) {
+function Column({ column, activeDragItemId, activeDragItemData, cardDropPreview }) {
   const {
     attributes,
     listeners,
@@ -139,7 +139,13 @@ function Column( { column } ) {
           </Box>
         </Box>
         {/* Column listcards */}
-        <ListCards cards={orderCards}/>
+        <ListCards
+          cards={orderCards}
+          activeDragItemId={activeDragItemId}
+          activeDragItemData={activeDragItemData}
+          cardDropPreview={cardDropPreview}
+          columnId={column._id}
+        />
         {/* Box column footer */}
         <Box sx={{
           height: (theme) => theme.trello.columnFooterHeight,
