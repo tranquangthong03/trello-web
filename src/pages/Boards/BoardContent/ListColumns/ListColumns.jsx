@@ -3,7 +3,7 @@ import Column from './Column/Column'
 import { Button } from '@mui/material'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import {SortableContext, horizontalListSortingStrategy} from '@dnd-kit/sortable'
-function ListColumns({ columns }) {
+function ListColumns({ columns, activeDragItemId, activeDragItemData, cardDropPreview }) {
   return (
     <SortableContext items={columns?.map(column => column._id)} strategy={horizontalListSortingStrategy}>
       <Box sx={{
@@ -15,7 +15,15 @@ function ListColumns({ columns }) {
         overflowY: 'hidden',
         '&::-webkit-scrollbar-track': { m: 2 }
       }}>
-        {columns?.map( column => <Column key={column._id} column={column}/>)}
+        {columns?.map(column => (
+          <Column
+            key={column._id}
+            column={column}
+            activeDragItemId={activeDragItemId}
+            activeDragItemData={activeDragItemData}
+            cardDropPreview={cardDropPreview}
+          />
+        ))}
 
 
         {/* Box add new column */}
