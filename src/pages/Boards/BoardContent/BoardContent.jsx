@@ -35,15 +35,111 @@ function BoardContent({ board }) {
     setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
   }, [board])
 
+  const findColumnByCardId = (cardId) => {
+    return orderedColumns.find(column => column.cards?.some(card => card._id === cardId))
+  }
   const handleDragStart = (event) => {
     setActiveDragItemId(event?.active?.id)
     setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
     setActiveDragItemData(event?.active?.data?.current)
   }
 
+
+  const handleDragOver = (event) => {
+    const { active, over } = event
+    const activeData = active?.data?.current
+
+    if (!active || !over || !activeData?.columnId) return
+
+    const activeDraggingCardId = active.id
+    const overCardId = over.id
+
+    // Tìm 2 column theo cardId
+    const activeColumn = findColumnByCardId(activeDraggingCardId)
+    const overColumn = orderedColumns.find(column =>
+      column._id === overCardId || column.cards?.some(card => card._id === overCardId)
+    )
+    //activeColumn có thể undefind do hàm findColumnByCardId không thể hoạt động được
+    if (!activeColumn || !overColumn) return
+
+    // Xử lý trường hợp kéo thả giữa 2 column khác nhau
+    if (activeColumn._id !== overColumn._id) {
+      console.log('Kéo thả card ở 2 column khác nhau')
+    }
+  }
+
   const handleDragEnd = (event) => {
-    console.log('drag end', event)
-    const { active, over } = event // active: item đang kéo, over: item sẽ bị thay thế
+    const { active, over } = event
+
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) {
+      if (active && over) {
+        setOrderedColumns((currentColumns) => {
+          const sourceColumnIndex = currentColumns.findIndex(column =>
+            column.cards?.some(card => card._id === active.id)
+          )
+          const targetColumnIndex = currentColumns.findIndex(column =>
+            column._id === over.id || column.cards?.some(card => card._id === over.id)
+          )
+
+          if (sourceColumnIndex === -1 || targetColumnIndex === -1) return currentColumns
+
+          const sourceColumn = currentColumns[sourceColumnIndex]
+          const targetColumn = currentColumns[targetColumnIndex]
+          const activeCard = sourceColumn.cards.find(card => card._id === active.id)
+
+          if (!activeCard) return currentColumns
+
+          if (sourceColumnIndex === targetColumnIndex) {
+            const oldIndex = sourceColumn.cards.findIndex(card => card._id === active.id)
+            const newIndex = targetColumn.cards.findIndex(card => card._id === over.id)
+
+            if (newIndex === -1 || oldIndex === newIndex) return currentColumns
+
+            const reorderedCards = arrayMove(sourceColumn.cards, oldIndex, newIndex)
+            const updatedColumns = [...currentColumns]
+            updatedColumns[sourceColumnIndex] = {
+              ...sourceColumn,
+              cards: reorderedCards,
+              cardOrderIds: reorderedCards.map(card => card._id)
+            }
+            return updatedColumns
+          }
+
+          const sourceCards = sourceColumn.cards.filter(card => card._id !== active.id)
+          const targetCards = [...targetColumn.cards]
+          const overIndex = targetCards.findIndex(card => card._id === over.id)
+          const insertIndex = overIndex === -1 ? targetCards.length : overIndex
+          targetCards.splice(insertIndex, 0, {
+            ...activeCard,
+            columnId: targetColumn._id
+          })
+
+          return currentColumns.map((column, index) => {
+            if (index === sourceColumnIndex) {
+              return {
+                ...column,
+                cards: sourceCards,
+                cardOrderIds: sourceCards.map(card => card._id)
+              }
+            }
+            if (index === targetColumnIndex) {
+              return {
+                ...column,
+                cards: targetCards,
+                cardOrderIds: targetCards.map(card => card._id)
+              }
+            }
+            return column
+          })
+        })
+      }
+
+      setActiveDragItemId(null)
+      setActiveDragItemType(null)
+      setActiveDragItemData(null)
+      return
+    }
+
     if (over && over.id !== active.id) {
       //Lấy vị trí cũ từ active
       const oldIndex = orderedColumns.findIndex( c => c._id === active.id)
@@ -79,6 +175,7 @@ function BoardContent({ board }) {
   return (
     <DndContext
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
       sensors={sensors}
