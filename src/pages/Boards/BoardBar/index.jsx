@@ -41,12 +41,14 @@ function BoardBar({ board }) {
         display:'flex', alignItems:'center', gap:2
       }}>
         <Box sx={{ display:'flex', alignItems:'center', gap:2 }}>
-          <Chip
-            sx={MENU_STYLES}
-            icon={<DashboardIcon />}
-            label={board?.title || 'tran quang thong'}
-            clickable
-          />
+          <Tooltip title={board?.description}>
+            <Chip
+              sx={MENU_STYLES}
+              icon={<DashboardIcon />}
+              label={board?.title || 'Quang thong Board'}
+              clickable
+            />
+          </Tooltip>
           <Chip
             sx={MENU_STYLES}
             icon={<VpnLockIcon />}
