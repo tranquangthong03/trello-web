@@ -193,6 +193,7 @@ function Column({ column, activeDragItemId, activeDragItemData, cardDropPreview 
                 type="text"
                 size='small'
                 autoFocus
+                data-no-dnd="true"
                 value={newCardTitle}
                 onChange={(e) => {setNewCardTitle(e.target.value)}}
                 sx={{
