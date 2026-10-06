@@ -1,13 +1,14 @@
 import Box from '@mui/material/Box'
 import Column from './Column/Column'
 import TextField from '@mui/material/TextField'
-import { Button } from '@mui/material'
+import { Alert, AlertTitle, Button, Snackbar } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable'
 import { useState } from 'react'
 function ListColumns({ columns, activeDragItemId, activeDragItemData, cardDropPreview }) {
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
+  const [openTitleError, setOpenTitleError] = useState(false)
   const toggleOpenNewColumnForm = ( () => {
     setOpenNewColumnForm(!openNewColumnForm)
     return
@@ -15,7 +16,7 @@ function ListColumns({ columns, activeDragItemId, activeDragItemData, cardDropPr
   const [newColumnTitle, setNewColumnTitle] = useState('')
   const addNewColumn = () => {
     if (!newColumnTitle) {
-      console.log('Nhập titile!')
+      setOpenTitleError(true)
       return
     }
     // console.log(newColumnTitle)
@@ -148,6 +149,30 @@ function ListColumns({ columns, activeDragItemId, activeDragItemData, cardDropPr
           </Box>
         }
       </Box>
+      <Snackbar
+        open={openTitleError}
+        autoHideDuration={3000}
+        onClose={() => setOpenTitleError(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          severity='error'
+          variant='filled'
+          onClose={() => setOpenTitleError(false)}
+          sx={{
+            width: '100%',
+            minWidth: { sm: '340px' },
+            alignItems: 'center',
+            borderRadius: 2,
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+            '& .MuiAlert-icon': { fontSize: 28 },
+            '& .MuiAlert-message': { py: 0.25 }
+          }}
+        >
+          <AlertTitle sx={{ mb: 0.25, fontWeight: 700 }}>Unable to add column</AlertTitle>
+          Please enter a column title before continuing.
+        </Alert>
+      </Snackbar>
     </SortableContext>
 
   )
